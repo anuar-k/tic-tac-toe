@@ -6,11 +6,15 @@ import Log from "./components/Log.jsx";
 import {WINNING_COMBINATIONS} from "./winning-combinations.js";
 import GameOver from "./components/GameOver.jsx";
 
-const initialBoard = [
+const INITIAL_BOARD = [
     [null, null, null],
     [null, null, null],
     [null, null, null]
 ]
+const PLAYERS = {
+    X: 'Player 1',
+    O: 'Player 2',
+}
 
 function deriveActivePlayer(turns) {
     let activePlayer = 'X'
@@ -20,15 +24,8 @@ function deriveActivePlayer(turns) {
     return activePlayer;
 }
 
-function App() {
+function deriveWinner(gameBoard, gameTurns, players) {
     let winner;
-    const [players, setPlayers] = useState({
-        X: 'Player 1',
-        O: 'Player 2',
-    })
-    const [gameTurns, setGameTurns] = useState([])
-    const activePlayer = deriveActivePlayer(gameTurns)
-    const gameBoard = [...initialBoard.map(inner => [...inner])];
 
     for (const tune of gameTurns) {
         const {square, player} = tune
@@ -42,10 +39,18 @@ function App() {
         const thirdSymbol = gameBoard[combination[2].row][combination[2].column]
 
         if (firstSymbol && firstSymbol === secondSymbol && firstSymbol === thirdSymbol) {
-            winner = firstSymbol
+            winner = players[firstSymbol]
         }
     }
+    return winner
+}
 
+function App() {
+    const [players, setPlayers] = useState(PLAYERS)
+    const [gameTurns, setGameTurns] = useState([])
+    const activePlayer = deriveActivePlayer(gameTurns)
+    const gameBoard = [...INITIAL_BOARD.map(inner => [...inner])];
+    const winner = deriveWinner(gameBoard, gameTurns, players)
     const hasDraw = gameTurns.length == 9 && !winner;
 
     const handleActiveSquare = (row, col) => {
